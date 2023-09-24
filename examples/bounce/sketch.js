@@ -2,6 +2,7 @@
 let speedFactor = 0.1;
 
 let v1, v2, v3;
+let osc, envelope;
 let balls = [];
 
 class Ball {
@@ -35,6 +36,8 @@ class Ball {
 
     // Check if the ball is outside of the triangle
     if (!pointInTriangle(this.pos, v1, v2, v3)) {
+      this.play_collision_sound();
+
       const nearestEdge = getNearestEdge(this.pos, v1, v2, v3);
       const normal = createVector(-nearestEdge.y, nearestEdge.x).normalize(); // normalize the nearestEdge vector
       const dot = p5.Vector.dot(normal, this.vel);
@@ -52,6 +55,13 @@ class Ball {
     }
   }
 
+  play_collision_sound() {
+    const freqIndex = getNearestEdgeIndex(this.pos, v1, v2, v3);
+    print(freqIndex);
+    osc.freq(midiToFreq(keyToNote[pentatonic_key[freqIndex]]));
+    envelope.play(osc, 0, 0.1);
+  }
+
   draw() {
     fill(this.color);
     ellipse(this.pos.x, this.pos.y, this.r, this.r);
@@ -60,8 +70,40 @@ class Ball {
 
 // Define the vertices of the triangle
 
+function setup_sound() {
+  osc = new p5.SinOsc();
+  envelope = new p5.Env();
+
+  // set attackTime, decayTime, sustainRatio, releaseTime
+  envelope.setADSR(0.001, 0.5, 0.1, 0.5);
+
+  // set attackLevel, releaseLevel
+  envelope.setRange(1, 0);
+
+  osc.start();
+  osc.freq(midiToFreq(keyToNote[pentatonic_key[5]]));
+  envelope.play(osc, 0, 0.1)
+}
+
+const keyToNote = {
+  'C4': 60, // Middle C
+  'D4': 62, // D
+  'E4': 64, // E
+  'F4': 65, // F
+  'G4': 67, // G
+  'A4': 69, // A
+  'B4': 71, // B
+  'C5': 72  // High C
+};
+
+
+const pentatonic_key = ['C4', 'D4', 'E4', 'G4', 'A4', 'C5'];
+
+
+
 function setup() {
   createCanvas(720, 400);
+  setup_sound();
   noStroke();
   frameRate(30);
   ellipseMode(RADIUS);
@@ -84,6 +126,13 @@ function draw() {
     ball.update();
     ball.draw();
   }
+
+  document.addEventListener('keydown', event => {
+    if (event.key in keyToNote) {
+      osc.freq(midiToFreq(keyToNote[event.key]));
+      envelope.play(osc, 0, 0.1);
+    }
+  })
 
   // if mouse is pressed, the last ball radius is growing
   if (mouseIsPressed) {
@@ -132,16 +181,35 @@ function getNearestEdge(p, v1, v2, v3) {
     [v2, v3],
     [v3, v1]
   ];
-  let nearestEdge = null;
+  const nearestEdgeIndex = getNearestEdgeIndex(p, v1, v2, v3) % 3;
+  const [v1_, v2_] = edges[nearestEdgeIndex];
+  const nearestEdge = p5.Vector.sub(v2_, v1_);
+  return nearestEdge;
+
+}
+
+function getNearestEdgeIndex(p, v1, v2, v3) {
+  const edges = [
+    [v1, v2],
+    [v2, v3],
+    [v3, v1]
+  ];
+
+  let nearestEdgeIndex = -1;
+  let nearestHalfSideIndex = -1;
   let minDist = Infinity;
-  for (const [v1, v2] of edges) {
+  for (let i = 0; i < edges.length; i++) {
+    const [v1, v2] = edges[i];
+    // Calculate the midpoint of the edge
+    const midpoint = p5.Vector.add(v1, v2).div(2);
     const dist = distToSegment(p, v1, v2);
     if (dist < minDist) {
-      nearestEdge = p5.Vector.sub(v2, v1);
+      nearestEdgeIndex = i;
       minDist = dist;
     }
+  nearestHalfSideIndex = distToSegment(p, v1, midpoint) < distToSegment(p, midpoint, v2) ? 0 : 1;
   }
-  return nearestEdge;
+  return nearestEdgeIndex+ 3*nearestHalfSideIndex;
 }
 
 function distToSegment(p, v1, v2) {
