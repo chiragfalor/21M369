@@ -14,9 +14,9 @@ let ydirection = 1; // Top to Bottom
 let balls = [];
 
 class Ball {
-  constructor(x, y, r) {
+  constructor(x, y, vx, vy, r) {
     this.pos = createVector(x, y);
-    this.vel = createVector(random(-5, 5), random(-5, 5));
+    this.vel = createVector(vx, vy);
     this.r = r;
     this.color = color(random(255), random(255), random(255));
   }
@@ -58,12 +58,14 @@ function setup() {
   frameRate(30);
   ellipseMode(RADIUS);
   // Set the starting position of the shape
-  for (let i = 0; i < 10; i++) {
-    const x = random(width);
-    const y = random(height);
-    const r = 20;
-    balls.push(new Ball(x, y, r));
-  }
+  // for (let i = 0; i < 10; i++) {
+  //   const x = random(width);
+  //   const y = random(height);
+  //   const vx = random(-5, 5);
+  //   const vy = random(-5, 5);
+  //   const r = 20;
+  //   balls.push(new Ball(x, y, vx, vy, r));
+  // }
   
   v1 = createVector(100, 100);
   v2 = createVector(600, 100);
@@ -82,6 +84,31 @@ function draw() {
     ball.update();
     ball.draw();
   }
+}
+
+function mousePressed() {
+  // Set the starting position of the ball
+  const x = mouseX;
+  const y = mouseY;
+  // Set the starting radius of the ball to 0
+  const r = 0;
+  // Record the start time of the mouse press
+  mousePressedTime = millis();
+  // Create a new Ball object and add it to the balls array
+  balls.push(new Ball(x, y, 0, 0, r));
+}
+
+function mouseReleased() {
+  const ball = balls[balls.length - 1];
+  const duration = millis() - mousePressedTime;
+  ball.r = map(duration, 0, 1000, 0, 50);
+  ball.r = min(ball.r, 50);
+  // the release coordinate compared to ball position
+  const dx = mouseX - ball.pos.x;
+  const dy = mouseY - ball.pos.y;
+  ball.vel.x = dx / 10;
+  ball.vel.y = dy / 10;
+
 }
 
 
