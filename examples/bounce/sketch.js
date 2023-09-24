@@ -1,16 +1,7 @@
-let rad = 10; // Width of the shape
-let xpos, ypos; // Starting position of shape
+
+let speedFactor = 0.1;
+
 let v1, v2, v3;
-let xspeed = 2.8; // Speed of the shape
-let yspeed = 2.2; // Speed of the shape
-
-let xdirection = 1; // Left or Right
-let ydirection = 1; // Top to Bottom
-
-// function createVector(x, y) {
-//   return { x, y };
-// }
-
 let balls = [];
 
 class Ball {
@@ -25,6 +16,14 @@ class Ball {
     // Update the position of the ball
     this.pos.add(this.vel);
 
+    // Update the velocity of the ball
+    this.update_velocity();
+
+    // Update the age of the ball
+    this.update_age();
+  }
+
+  update_velocity() {
     // Test to see if the ball exceeds the boundaries of the screen
     // If it does, reverse its direction by multiplying by -1
     if (this.pos.x > width - this.r || this.pos.x < this.r) {
@@ -44,6 +43,15 @@ class Ball {
     }
   }
 
+  update_age() {
+    this.r -= 0.1;
+    // Remove the ball from the balls array when the radius becomes 0
+    if (this.r < -0.1) {
+      const index = balls.indexOf(this);
+      balls.splice(index, 1);
+    }
+  }
+
   draw() {
     fill(this.color);
     ellipse(this.pos.x, this.pos.y, this.r, this.r);
@@ -57,15 +65,6 @@ function setup() {
   noStroke();
   frameRate(30);
   ellipseMode(RADIUS);
-  // Set the starting position of the shape
-  // for (let i = 0; i < 10; i++) {
-  //   const x = random(width);
-  //   const y = random(height);
-  //   const vx = random(-5, 5);
-  //   const vy = random(-5, 5);
-  //   const r = 20;
-  //   balls.push(new Ball(x, y, vx, vy, r));
-  // }
   
   v1 = createVector(100, 100);
   v2 = createVector(600, 100);
@@ -75,27 +74,29 @@ function setup() {
 
 
 function draw() {
-  background(102);
-  // draw the green triangle and pink ball
-  fill(0, 255, 0);
+  background(100, 100, 100, 100);
+
+  // Draw the triangle
+  fill(200, 255, 200);
   triangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y);
 
   for (const ball of balls) {
     ball.update();
     ball.draw();
   }
+
+  // if mouse is pressed, the last ball radius is growing
+  if (mouseIsPressed) {
+    const ball = balls[balls.length - 1];
+    const duration = millis() - mousePressedTime;
+    ball.r = map(duration, 0, 1000, 0, 50);
+    ball.r = min(ball.r, 50);
+  }
 }
 
 function mousePressed() {
-  // Set the starting position of the ball
-  const x = mouseX;
-  const y = mouseY;
-  // Set the starting radius of the ball to 0
-  const r = 0;
-  // Record the start time of the mouse press
   mousePressedTime = millis();
-  // Create a new Ball object and add it to the balls array
-  balls.push(new Ball(x, y, 0, 0, r));
+  balls.push(new Ball(mouseX, mouseY, 0, 0, 0));
 }
 
 function mouseReleased() {
@@ -103,11 +104,9 @@ function mouseReleased() {
   const duration = millis() - mousePressedTime;
   ball.r = map(duration, 0, 1000, 0, 50);
   ball.r = min(ball.r, 50);
-  // the release coordinate compared to ball position
-  const dx = mouseX - ball.pos.x;
-  const dy = mouseY - ball.pos.y;
-  ball.vel.x = dx / 10;
-  ball.vel.y = dy / 10;
+  // the release coordinate compared to ball position is the velocity
+  ball.vel.x = (mouseX - ball.pos.x) * speedFactor;
+  ball.vel.y = (mouseY - ball.pos.y) * speedFactor;
 
 }
 
