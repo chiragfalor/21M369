@@ -1,5 +1,18 @@
 
-let speedFactor = 0.1;
+let mouseEnergy = 0.1;
+let volumeFactor = 1;
+let resonanceFactor = 1;
+
+// equilateral straight triangle
+let [x1, y1] = [50, 350];
+let [x2, y2] = [250, 50];
+let [x3, y3] = [450, 350];
+
+// sound of sides
+const pentatonic_key = ['C4', 'G4',  'E4',  'C5',  'A4', 'D4'];
+
+let width = 500;
+let height = 400;
 
 let v1, v2, v3;
 let osc, envelope;
@@ -10,7 +23,18 @@ class Ball {
     this.pos = createVector(x, y);
     this.vel = createVector(vx, vy);
     this.r = r;
-    this.color = color(random(255), random(255), random(255));
+    this.color = color(random(255), random(200), 50+random(205));
+    this.osc = new p5.Oscillator();
+    this.envelope = new p5.Envelope();
+    // set attackTime, decayTime, sustainRatio, releaseTime
+    this.envelope.setADSR(0.001, 0.1*resonanceFactor, 0.1, 0.1*resonanceFactor);
+
+    // set attackLevel, releaseLevel
+    this.envelope.setRange(1, 0);
+
+    this.osc.start();
+    this.osc.freq(midiToFreq(10));
+    this.envelope.play(osc, 0, 0.1)
   }
 
   update() {
@@ -49,7 +73,7 @@ class Ball {
   update_age() {
     this.r -= 0.1;
     // Remove the ball from the balls array when the radius becomes 0
-    if (this.r < -0.1) {
+    if (this.r < 0) {
       const index = balls.indexOf(this);
       balls.splice(index, 1);
     }
@@ -58,8 +82,9 @@ class Ball {
   play_collision_sound() {
     const freqIndex = getNearestEdgeIndex(this.pos, v1, v2, v3);
     print(freqIndex);
-    osc.freq(midiToFreq(keyToNote[pentatonic_key[freqIndex]]));
-    envelope.play(osc, 0, 0.1);
+    this.osc.freq(midiToFreq(keyToNote[pentatonic_key[freqIndex]]));
+    this.envelope.setRange(this.r**2/10000*volumeFactor, 0);
+    this.envelope.play(this.osc, 0, 0.1);
   }
 
   draw() {
@@ -81,7 +106,7 @@ function setup_sound() {
   envelope.setRange(1, 0);
 
   osc.start();
-  osc.freq(midiToFreq(keyToNote[pentatonic_key[5]]));
+  osc.freq(midiToFreq(10));
   envelope.play(osc, 0, 0.1)
 }
 
@@ -97,20 +122,27 @@ const keyToNote = {
 };
 
 
-const pentatonic_key = ['C4', 'D4', 'E4', 'G4', 'A4', 'C5'];
+// const pentatonic_key = ['C4', 'D4', 'E4', 'G4', 'A4', 'C5'];
+
+
 
 
 
 function setup() {
-  createCanvas(720, 400);
+  createCanvas(width, height);
   setup_sound();
   noStroke();
   frameRate(30);
   ellipseMode(RADIUS);
+
+  v1 = createVector(x1, y1);
+  v2 = createVector(x2, y2);
+  v3 = createVector(x3, y3);
+
   
-  v1 = createVector(100, 100);
-  v2 = createVector(600, 100);
-  v3 = createVector(350, 350);
+  // v1 = createVector(100, 100);
+  // v2 = createVector(600, 100);
+  // v3 = createVector(350, 350);
 
 }
 
@@ -119,7 +151,7 @@ function draw() {
   background(100, 100, 100, 100);
 
   // Draw the triangle
-  fill(200, 255, 200);
+  fill(76, 255, 0);
   triangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y);
 
   for (const ball of balls) {
@@ -145,7 +177,7 @@ function draw() {
 
 function mousePressed() {
   mousePressedTime = millis();
-  balls.push(new Ball(mouseX, mouseY, 0, 0, 0));
+  balls.push(new Ball(mouseX, mouseY, 0, 0, 0.1));
 }
 
 function mouseReleased() {
@@ -154,8 +186,8 @@ function mouseReleased() {
   ball.r = map(duration, 0, 1000, 0, 50);
   ball.r = min(ball.r, 50);
   // the release coordinate compared to ball position is the velocity
-  ball.vel.x = (mouseX - ball.pos.x) * speedFactor;
-  ball.vel.y = (mouseY - ball.pos.y) * speedFactor;
+  ball.vel.x = (mouseX - ball.pos.x) * mouseEnergy;
+  ball.vel.y = (mouseY - ball.pos.y) * mouseEnergy;
 
 }
 
