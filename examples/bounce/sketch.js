@@ -11,6 +11,37 @@ let [x3, y3] = [450, 350];
 // sound of sides
 const pentatonic_key = ['C4', 'G4',  'E4',  'C5',  'A4', 'D4'];
 
+/*
+──────────▒▒▒▒▒▒▒
+─────────▓▓▒▒▒▒▒▒▒
+────────▓▓▓▓▒▒▒▒▒▒
+────────█▓▓▓▓▒▒▒▒▒▒
+───────██▓▓▓▓▒▒▒▒▒▒
+──────██▓▓▓▓▓▒▒▒▒▒▒
+─────██▓▓▓▓▓▓▒▒▒▒▒▒
+─────█▓▓▓▓▓▓▓▒▒▒▒▒▒
+────██▓▓▓▓▓▓██▒▒▒▒▒▒
+────█▓▓▓▓▓▓██▒▒▒▒▒▒▒
+───██▓▓▓▓██▒▒▒▒▒▒▒▒▒
+───█▓▓▓▓██▒▒▒▒▒▒▒▒▒▒
+──████▒▒▒▒▒▒▒▒▒▒▒▒
+─██▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒
+██▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒
+████▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+─██▒▒▒▒█████████
+──██▒▒█████████
+───██████████
+ 
+*/
+
+
+
+
+
+
+
+
+
 let width = 500;
 let height = 400;
 
@@ -81,7 +112,6 @@ class Ball {
 
   play_collision_sound() {
     const freqIndex = getNearestEdgeIndex(this.pos, v1, v2, v3);
-    print(freqIndex);
     this.osc.freq(midiToFreq(keyToNote[pentatonic_key[freqIndex]]));
     this.envelope.setRange(this.r**2/10000*volumeFactor, 0);
     this.envelope.play(this.osc, 0, 0.1);
