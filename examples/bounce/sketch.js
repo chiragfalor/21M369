@@ -1,3 +1,8 @@
+// explore how to constrain the user to quantized rhythms
+// what progression do we want the users to experience?
+// keeping it exploratory but allowing users to create musical pieces
+// Also play with sound modulation
+// circle would be great for rhythm and we can fake constrain the user to quantized rhythms
 
 let mouseEnergy = 0.1;
 let volumeFactor = 1;
