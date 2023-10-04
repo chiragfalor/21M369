@@ -14,39 +14,7 @@ let [x2, y2] = [250, 50];
 let [x3, y3] = [450, 350];
 
 // sound of sides
-const pentatonic_key = ['C4', 'G4',  'E4',  'C5',  'A4', 'D4'];
 const petatonic_pitch = [0, 7, 4, 12, 9, 2];
-
-/*
-──────────▒▒▒▒▒▒▒
-─────────▓▓▒▒▒▒▒▒▒
-────────▓▓▓▓▒▒▒▒▒▒
-────────█▓▓▓▓▒▒▒▒▒▒
-───────██▓▓▓▓▒▒▒▒▒▒
-──────██▓▓▓▓▓▒▒▒▒▒▒
-─────██▓▓▓▓▓▓▒▒▒▒▒▒
-─────█▓▓▓▓▓▓▓▒▒▒▒▒▒
-────██▓▓▓▓▓▓██▒▒▒▒▒▒
-────█▓▓▓▓▓▓██▒▒▒▒▒▒▒
-───██▓▓▓▓██▒▒▒▒▒▒▒▒▒
-───█▓▓▓▓██▒▒▒▒▒▒▒▒▒▒
-──████▒▒▒▒▒▒▒▒▒▒▒▒
-─██▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒
-██▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒
-████▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-─██▒▒▒▒█████████
-──██▒▒█████████
-───██████████
- 
-*/
-
-
-
-
-
-
-
-
 
 let width = 500;
 let height = 400;
@@ -55,23 +23,19 @@ let v1, v2, v3;
 let osc, envelope;
 let balls = [];
 
+
+var selectedPreset=_tone_0000_JCLive_sf2_file;
+var AudioContextFunc = window.AudioContext || window.webkitAudioContext;
+var audioContext = new AudioContextFunc();
+var player=new WebAudioFontPlayer();
+player.loader.decodeAfterLoading(audioContext, '_tone_0000_JCLive_sf2_file');
+
 class Ball {
   constructor(x, y, vx, vy, r) {
     this.pos = createVector(x, y);
     this.vel = createVector(vx, vy);
     this.r = r;
     this.color = color(random(255), random(200), 50+random(205));
-    this.osc = new p5.Oscillator();
-    this.envelope = new p5.Envelope();
-    // set attackTime, decayTime, sustainRatio, releaseTime
-    this.envelope.setADSR(0.001, 0.1*resonanceFactor, 0.1, 0.1*resonanceFactor);
-
-    // set attackLevel, releaseLevel
-    this.envelope.setRange(1, 0);
-
-    this.osc.start();
-    this.osc.freq(midiToFreq(10));
-    this.envelope.play(osc, 0, 0.1)
   }
 
   update() {
@@ -118,9 +82,7 @@ class Ball {
 
   play_collision_sound() {
     const freqIndex = getNearestEdgeIndex(this.pos, v1, v2, v3);
-    this.osc.freq(midiToFreq(72 + petatonic_pitch[freqIndex]));
-    this.envelope.setRange(this.r**2/10000*volumeFactor, 0);
-    this.envelope.play(this.osc, 0, 0.1);
+    player.queueWaveTable(audioContext, audioContext.destination, selectedPreset,0, 12*5+ petatonic_pitch[freqIndex], 0.5);
   }
 
   draw() {
@@ -129,44 +91,10 @@ class Ball {
   }
 }
 
-// Define the vertices of the triangle
-
-function setup_sound() {
-  osc = new p5.SinOsc();
-  envelope = new p5.Env();
-
-  // set attackTime, decayTime, sustainRatio, releaseTime
-  envelope.setADSR(0.001, 0.5, 0.1, 0.5);
-
-  // set attackLevel, releaseLevel
-  envelope.setRange(1, 0);
-
-  osc.start();
-  osc.freq(midiToFreq(10));
-  envelope.play(osc, 0, 0.1)
-}
-
-const keyToNote = {
-  'C4': 60, // Middle C
-  'D4': 62, // D
-  'E4': 64, // E
-  'F4': 65, // F
-  'G4': 67, // G
-  'A4': 69, // A
-  'B4': 71, // B
-  'C5': 72  // High C
-};
-
-
-// const pentatonic_key = ['C4', 'D4', 'E4', 'G4', 'A4', 'C5'];
-
-
-
 
 
 function setup() {
   createCanvas(width, height);
-  setup_sound();
   noStroke();
   frameRate(30);
   ellipseMode(RADIUS);
@@ -175,10 +103,6 @@ function setup() {
   v2 = createVector(x2, y2);
   v3 = createVector(x3, y3);
 
-  
-  // v1 = createVector(100, 100);
-  // v2 = createVector(600, 100);
-  // v3 = createVector(350, 350);
 
 }
 
@@ -194,13 +118,6 @@ function draw() {
     ball.update();
     ball.draw();
   }
-
-  document.addEventListener('keydown', event => {
-    if (event.key in keyToNote) {
-      osc.freq(midiToFreq(keyToNote[event.key]));
-      envelope.play(osc, 0, 0.1);
-    }
-  })
 
   // if mouse is pressed, the last ball radius is growing
   if (mouseIsPressed) {
