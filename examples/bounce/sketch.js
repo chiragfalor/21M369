@@ -83,7 +83,6 @@ class Ball {
     // Update the age of the ball
     this.update_age();
   }
-
   update_velocity() {
     // Test to see if the ball exceeds the boundaries of the screen
     // If it does, reverse its direction by multiplying by -1
@@ -198,6 +197,10 @@ function draw() {
     if (event.key in keyToNote) {
       osc.freq(midiToFreq(keyToNote[event.key]));
       envelope.play(osc, 0, 0.1);
+    };
+    if (event.key === 'ArrowUp') {
+       // spawn a ball
+      balls.push(new Ball(random(width), random(height), random(-5, 5), random(-5, 5), 10));
     }
   })
 

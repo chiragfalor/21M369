@@ -4,39 +4,49 @@
 // Also play with sound modulation
 // circle would be great for rhythm and we can fake constrain the user to quantized rhythms
 
+// add button to stop
+
 let mouseEnergy = 0.1;
 let volumeFactor = 1;
 let resonanceFactor = 1;
 
-// equilateral straight triangle
-let [x1, y1] = [50, 350];
-let [x2, y2] = [250, 50];
-let [x3, y3] = [450, 350];
+let metronome = 120;
+
+let circleRadius = 150;
 
 // sound of sides
 const petatonic_pitch = [0, 7, 4, 12, 9, 2];
 
+// rhythms
+const rhythms = [1, 4/3, 3/2, 2, 3, 4, 6, 8, 9, 12, 16];
+
 let width = 500;
 let height = 400;
-
-let v1, v2, v3;
+let x0 = width / 2;
+let y0 = height / 2;
 let osc, envelope;
 let balls = [];
 
 
-var selectedPreset=_tone_0000_JCLive_sf2_file;
-var AudioContextFunc = window.AudioContext || window.webkitAudioContext;
-var audioContext = new AudioContextFunc();
-var player=new WebAudioFontPlayer();
-player.loader.decodeAfterLoading(audioContext, '_tone_0000_JCLive_sf2_file');
 
-class Ball {
+class SoundObject {
   constructor(x, y, vx, vy, r) {
     this.pos = createVector(x, y);
     this.vel = createVector(vx, vy);
     this.r = r;
     this.color = color(random(255), random(200), 50+random(205));
+    this.setup_sound();
   }
+
+  setup_sound() {
+    return;
+    // osc = new p5.Oscillator('sine');
+    // envelope = new p5.Envelope();
+    // osc.amp(envelope);
+    // osc.start();
+  }
+
+
 
   update() {
     // Update the position of the ball
@@ -60,11 +70,11 @@ class Ball {
     }
 
     // Check if the ball is outside of the triangle
-    if (!pointInTriangle(this.pos, v1, v2, v3)) {
+    if (!pointInCircle(this.pos, x0, y0, circleRadius)) {
       this.play_collision_sound();
-
-      const nearestEdge = getNearestEdge(this.pos, v1, v2, v3);
-      const normal = createVector(-nearestEdge.y, nearestEdge.x).normalize(); // normalize the nearestEdge vector
+      this.r -= 0.1;
+      // Reflect the ball's velocity off the circle's edge
+      const normal = p5.Vector.sub(this.pos, createVector(x0, y0)).normalize();
       const dot = p5.Vector.dot(normal, this.vel);
       const reflected = p5.Vector.sub(this.vel, p5.Vector.mult(normal, 2 * dot));
       this.vel = reflected;
@@ -79,10 +89,24 @@ class Ball {
       balls.splice(index, 1);
     }
   }
+}
+
+class Ball extends SoundObject {
+  constructor(x, y, vx, vy, r) {
+    super(x, y, vx, vy, r);
+  }
+
+  setup_sound() {
+    this.selectedPreset=_tone_0000_JCLive_sf2_file;
+    var AudioContextFunc = window.AudioContext || window.webkitAudioContext;
+    this.audioContext = new AudioContextFunc();
+    this.player=new WebAudioFontPlayer();
+    this.player.loader.decodeAfterLoading(this.audioContext, '_tone_0000_JCLive_sf2_file');
+  }
 
   play_collision_sound() {
-    const freqIndex = getNearestEdgeIndex(this.pos, v1, v2, v3);
-    player.queueWaveTable(audioContext, audioContext.destination, selectedPreset,0, 12*5+ petatonic_pitch[freqIndex], 0.5);
+    const freqIndex = getFrequencyIndex(this.pos, x0, y0, circleRadius);
+    this.player.queueWaveTable(this.audioContext, this.audioContext.destination, this.selectedPreset,0, 12*5+ petatonic_pitch[freqIndex], 0.5);
   }
 
   draw() {
@@ -93,15 +117,12 @@ class Ball {
 
 
 
+
 function setup() {
   createCanvas(width, height);
   noStroke();
   frameRate(30);
   ellipseMode(RADIUS);
-
-  v1 = createVector(x1, y1);
-  v2 = createVector(x2, y2);
-  v3 = createVector(x3, y3);
 
 
 }
@@ -112,7 +133,7 @@ function draw() {
 
   // Draw the triangle
   fill(76, 255, 0);
-  triangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y);
+  ellipse(x0, y0, circleRadius, circleRadius);
 
   for (const ball of balls) {
     ball.update();
@@ -122,10 +143,27 @@ function draw() {
   // if mouse is pressed, the last ball radius is growing
   if (mouseIsPressed) {
     const ball = balls[balls.length - 1];
-    const duration = millis() - mousePressedTime;
-    ball.r = map(duration, 0, 1000, 0, 50);
-    ball.r = min(ball.r, 50);
+    ball.r = getBallRadius();
+    // draw the velocity vector
+    const v = getBallVelocity(ball, mouseX, mouseY);
+
+    // draw the velocity vector
+    drawArrow(ball.pos.x, ball.pos.y, ball.pos.x+v.x*10, ball.pos.y+v.y*10, 3, color(255, 0, 0));
+
+    
   }
+}
+
+function drawArrow(x1, y1, x2, y2, thickness, color) {
+  push();
+  stroke(color);
+  strokeWeight(thickness);
+  line(x1, y1, x2, y2);
+  const angle = atan2(y2 - y1, x2 - x1);
+  const headlen = 10;
+  line(x2, y2, x2 - headlen * cos(angle - PI / 7), y2 - headlen * sin(angle - PI / 7));
+  line(x2, y2, x2 - headlen * cos(angle + PI / 7), y2 - headlen * sin(angle + PI / 7));
+  pop();
 }
 
 function mousePressed() {
@@ -135,12 +173,9 @@ function mousePressed() {
 
 function mouseReleased() {
   const ball = balls[balls.length - 1];
-  const duration = millis() - mousePressedTime;
-  ball.r = map(duration, 0, 1000, 0, 50);
-  ball.r = min(ball.r, 50);
+  ball.r = getBallRadius();
   // the release coordinate compared to ball position is the velocity
-  ball.vel.x = (mouseX - ball.pos.x) * mouseEnergy;
-  ball.vel.y = (mouseY - ball.pos.y) * mouseEnergy;
+  ball.vel = getBallVelocity(ball, mouseX, mouseY);
 
 }
 
@@ -148,67 +183,55 @@ function mouseReleased() {
 
 // utils
 
-
-function pointInTriangle(p, v1, v2, v3) {
-  const b1 = sign(p, v1, v2) < 0;
-  const b2 = sign(p, v2, v3) < 0;
-  const b3 = sign(p, v3, v1) < 0;
-  return ((b1 == b2) && (b2 == b3));
+// Check if a point is inside a circle
+function pointInCircle(p, cx, cy, r) {
+  const d = dist(p.x, p.y, cx, cy);
+  return d <= r;
 }
 
-function sign(p1, p2, p3) {
-  return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+// Function to get the frequency index based on position and circle parameters
+function getFrequencyIndex(p, cx, cy, r) {
+  // Calculate the angle between the center of the circle and the point p
+  const angle = atan2(p.y - cy, p.x - cx);
+  // Map the angle to a frequency index based on the number of petatonic_pitch values
+  const index = Math.floor(map(angle, -PI, PI, 0, petatonic_pitch.length));
+  return index;
 }
 
-function getNearestEdge(p, v1, v2, v3) {
-  const edges = [
-    [v1, v2],
-    [v2, v3],
-    [v3, v1]
-  ];
-  const nearestEdgeIndex = getNearestEdgeIndex(p, v1, v2, v3) % 3;
-  const [v1_, v2_] = edges[nearestEdgeIndex];
-  const nearestEdge = p5.Vector.sub(v2_, v1_);
-  return nearestEdge;
 
+function getBallVelocity(ball, mouseX, mouseY) {
+  const v = propVelocity(ball.pos.x, ball.pos.y, mouseX, mouseY);
+  return snapToRhythmVelocity(v, ball.pos.x, ball.pos.y);
 }
 
-function getNearestEdgeIndex(p, v1, v2, v3) {
-  const edges = [
-    [v1, v2],
-    [v2, v3],
-    [v3, v1]
-  ];
-
-  let nearestEdgeIndex = -1;
-  let nearestHalfSideIndex = -1;
-  let minDist = Infinity;
-  for (let i = 0; i < edges.length; i++) {
-    const [v1, v2] = edges[i];
-    // Calculate the midpoint of the edge
-    const midpoint = p5.Vector.add(v1, v2).div(2);
-    const dist = distToSegment(p, v1, v2);
-    if (dist < minDist) {
-      nearestEdgeIndex = i;
-      minDist = dist;
-    }
-  nearestHalfSideIndex = distToSegment(p, v1, midpoint) < distToSegment(p, midpoint, v2) ? 0 : 1;
-  }
-  return nearestEdgeIndex+ 3*nearestHalfSideIndex;
+function getBallRadius() {
+  const duration = millis() - mousePressedTime;
+  r = map(duration, 0, 1000, 0, 50);
+  return min(r, 20);
 }
 
-function distToSegment(p, v1, v2) {
-  const v = p5.Vector.sub(v2, v1);
-  const w = p5.Vector.sub(p, v1);
-  const c1 = p5.Vector.dot(w, v);
-  if (c1 <= 0) {
-    return p5.Vector.dist(p, v1);
-  }
-  const c2 = p5.Vector.dot(v, v);
-  if (c2 <= c1) {
-    return p5.Vector.dist(p, v2);
-  }
-  const b = c1 / c2;
-  const pb = p5.Vector.add(v1, p5.Vector.mult(v, b));
-  return p5.Vector.dist(p, pb);
+function propVelocity(ballx, bally, mouseX, mouseY) {
+  const dx = -(mouseX - ballx);
+  const dy = -(mouseY - bally);
+  const v = createVector(dx*mouseEnergy, dy*mouseEnergy);
+  return v;
 }
+
+
+function snapToRhythmVelocity(v, ballx, bally){
+  const r = createVector(x0-ballx, y0-bally);
+  const cosTheta = v.dot(r)/(v.mag()*r.mag());
+  // chord length = sqrt(R^2 - r^2*sin^2(theta))
+  const chordLength = sqrt(circleRadius*circleRadius - r.mag()*r.mag()*(1-cosTheta*cosTheta));
+  // we want velocity over chord length to be a multiple of the rhythm*metronome; snap to the closest rhythm
+  const snap_v = chordLength*snapToNearestRhythm(v.mag()/chordLength);
+  const snap_v_vector = p5.Vector.mult(v.normalize(), snap_v);
+  return snap_v_vector;
+}
+
+function snapToNearestRhythm(freq){
+  const ratio = metronome*freq;
+  const rhythmIndex = rhythms.reduce((iMax, x, i, arr) => x < ratio ? i : iMax, 0);
+  return rhythms[rhythmIndex]/metronome;
+}
+
