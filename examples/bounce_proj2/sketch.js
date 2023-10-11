@@ -32,6 +32,8 @@ let y0 = height / 2;
 let osc, envelope;
 let balls = [];
 
+let instrument = 's';
+
 
 
 class SoundObject {
@@ -96,9 +98,11 @@ class SoundObject {
   }
 }
 
-class Ball extends SoundObject {
-  constructor(x, y, vx, vy, r) {
+class Piano extends SoundObject {
+  constructor(x, y, vx, vy, r, duration) {
     super(x, y, vx, vy, r);
+    this.duration = duration;
+
   }
 
   setup_sound() {
@@ -111,12 +115,24 @@ class Ball extends SoundObject {
 
   play_collision_sound() {
     const freqIndex = getFrequencyIndex(this.pos, x0, y0, circleRadius);
-    this.player.queueWaveTable(this.audioContext, this.audioContext.destination, this.selectedPreset,0, 12*5+ petatonic_pitch[freqIndex], 0.5);
+    this.player.queueWaveTable(this.audioContext, this.audioContext.destination, this.selectedPreset,0, 12*5+ petatonic_pitch[freqIndex], this.duration);
   }
 
   draw() {
     fill(this.color);
     ellipse(this.pos.x, this.pos.y, this.r, this.r);
+  }
+}
+
+class shortPiano extends Piano {
+  constructor(x, y, vx, vy, r) {
+    super(x, y, vx, vy, r, 0.2);
+  }
+}
+
+class longPiano extends Piano {
+  constructor(x, y, vx, vy, r) {
+    super(x, y, vx, vy, r, 1);
   }
 }
 
@@ -125,47 +141,78 @@ class Drum extends SoundObject {
     super(x, y, vx, vy, r);
   }
 
-  
-  setup_sound() {
-    this.selectedPreset=_tone_0000_JCLive_sf2_file;
-    var AudioContextFunc = window.AudioContext || window.webkitAudioContext;
-    this.audioContext = new AudioContextFunc();
-    this.player=new WebAudioFontPlayer();
-    this.player.loader.decodeAfterLoading(this.audioContext, '_tone_0000_JCLive_sf2_file');
-  }
-
-  play_collision_sound() {
-    const freqIndex = getFrequencyIndex(this.pos, x0, y0, circleRadius);
-    this.player.queueWaveTable(this.audioContext, this.audioContext.destination, this.selectedPreset,0, 12*5+ petatonic_pitch[freqIndex], 0.5);
-  }
-
-  // setup_sound() {
-  //   this.selectedPreset=_drum_35_0_SBLive_sf2_file;
-  //   var AudioContextFunc = window.AudioContext || window.webkitAudioContext;
-  //   this.audioContext = new AudioContextFunc();
-  //   this.player=new WebAudioFontPlayer();
-  //   this.player.loader.decodeAfterLoading(this.audioContext, '_drum_35_0_SBLive_sf2_file');
-  // }
-
-  // play_collision_sound() {
-  //   this.player.queueWaveTable(this.audioContext, this.audioContext.destination, this.selectedPreset,0, 12*5, 0.5);
-  // }
-
   draw() {
     const bar_ratio = 0.2;
     fill(this.color);
     ellipse(this.pos.x, this.pos.y, this.r, this.r);
     const numCircles = 8;
     const angleStep = TWO_PI / numCircles;
-    const circleRadius = this.r / 2;
+    const circleRadius = this.r;
     for (let i = 0; i < numCircles; i++) {
       const angle = i * angleStep;
       const x = this.pos.x + cos(angle) * circleRadius * (1 + bar_ratio);
       const y = this.pos.y + sin(angle) * circleRadius * (1 + bar_ratio);
+      fill(0, 0, 0);
       ellipse(x, y, circleRadius * bar_ratio, circleRadius * bar_ratio);
     }
   }
 }
+
+class tom3Drum extends Drum {
+  constructor(x, y, vx, vy, r) {
+    super(x, y, vx, vy, r);
+  }
+  
+  setup_sound() {
+    var AudioContextFunc = window.AudioContext || window.webkitAudioContext;
+    this.audioContext = new AudioContextFunc();
+    this.player=new WebAudioFontPlayer();
+    this.player.loader.decodeAfterLoading(this.audioContext, '_drum_41_1_JCLive_sf2_file');
+  }
+
+  play_collision_sound() {
+    const freqIndex = getFrequencyIndex(this.pos, x0, y0, circleRadius);
+    this.player.queueWaveTable(this.audioContext, this.audioContext.destination, _drum_41_1_JCLive_sf2_file, 0, 41, 3);
+  }
+}
+
+class Snare extends Drum {
+  constructor(x, y, vx, vy, r) {
+    super(x, y, vx, vy, r);
+  }
+
+  setup_sound() {
+    var AudioContextFunc = window.AudioContext || window.webkitAudioContext;
+    this.audioContext = new AudioContextFunc();
+    this.player=new WebAudioFontPlayer();
+    this.player.loader.decodeAfterLoading(this.audioContext, '_drum_40_1_JCLive_sf2_file');
+  }
+
+  play_collision_sound() {
+    const freqIndex = getFrequencyIndex(this.pos, x0, y0, circleRadius);
+    this.player.queueWaveTable(this.audioContext, this.audioContext.destination, _drum_40_1_JCLive_sf2_file, 0, 40, 3);
+  }
+}
+
+// make a dictionary of sound objects
+const soundObjects = {
+  's': shortPiano,
+  'l': longPiano,
+  't': tom3Drum,
+  'd': Snare,
+}
+
+
+
+keyPressed = function() {
+  if (key == ' ') {
+    balls = [];
+  }
+  if (key in soundObjects) {
+    instrument = key;
+  }
+}
+
 
 
 
@@ -200,10 +247,6 @@ function draw() {
     drawArrow(ball.pos.x, ball.pos.y, ball.pos.x+v.x*5, ball.pos.y+v.y*5, 3, color(255, 0, 0));
   }
 
-  // if space bar is pressed, kill all balls
-  if (keyIsPressed && key == ' ') {
-    balls = [];
-  }
 }
 
 function drawArrow(x1, y1, x2, y2, thickness, color) {
@@ -220,7 +263,9 @@ function drawArrow(x1, y1, x2, y2, thickness, color) {
 
 function mousePressed() {
   mousePressedTime = millis();
-  balls.push(new Ball(mouseX, mouseY, 0, 0, 0.1));
+  // make object based on the key pressed
+  const soundObject = soundObjects[instrument];
+  balls.push(new soundObject(mouseX, mouseY, 0, 0, 0.1));
 }
 
 function mouseReleased() {
