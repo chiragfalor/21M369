@@ -9,8 +9,9 @@
 let mouseEnergy = 0.1;
 let volumeFactor = 1;
 let resonanceFactor = 1;
+let lifetime = 100;
 
-let metronome = 120;
+let metronome = 60;
 
 let circleRadius = 150;
 
@@ -18,7 +19,11 @@ let circleRadius = 150;
 const petatonic_pitch = [0, 7, 4, 12, 9, 2];
 
 // rhythms
-const rhythms = [1, 4/3, 3/2, 2, 3, 4, 6, 8, 9, 12, 16];
+
+const lvl1 = [1, 2, 3, 4];
+const lvl2 = [1, 4/3, 3/2, 2, 3, 4, 6];
+const lvl3 = [1, 4/3, 3/2, 2, 3, 4, 6, 8, 9, 12, 16];
+const rhythms = lvl1;
 
 let width = 500;
 let height = 400;
@@ -82,7 +87,7 @@ class SoundObject {
   }
 
   update_age() {
-    this.r -= 0.1;
+    this.r -= 1/lifetime;
     // Remove the ball from the balls array when the radius becomes 0
     if (this.r < 0) {
       const index = balls.indexOf(this);
@@ -192,9 +197,12 @@ function draw() {
     const v = getBallVelocity(ball, mouseX, mouseY);
 
     // draw the velocity vector
-    drawArrow(ball.pos.x, ball.pos.y, ball.pos.x+v.x*10, ball.pos.y+v.y*10, 3, color(255, 0, 0));
+    drawArrow(ball.pos.x, ball.pos.y, ball.pos.x+v.x*5, ball.pos.y+v.y*5, 3, color(255, 0, 0));
+  }
 
-    
+  // if space bar is pressed, kill all balls
+  if (keyIsPressed && key == ' ') {
+    balls = [];
   }
 }
 
@@ -274,8 +282,10 @@ function snapToRhythmVelocity(v, ballx, bally){
 }
 
 function snapToNearestRhythm(freq){
-  const ratio = metronome*freq;
+  const ratio = freq*20;
+  // const rhythmIndex = rhythms.reduce((iMax, x, i, arr) => x < ratio ? i : iMax, 0);
   const rhythmIndex = rhythms.reduce((iMax, x, i, arr) => x < ratio ? i : iMax, 0);
-  return rhythms[rhythmIndex]/metronome;
+  console.log(ratio);
+  return rhythms[rhythmIndex]*metronome/1000;
 }
 
