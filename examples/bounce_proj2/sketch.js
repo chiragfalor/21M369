@@ -115,6 +115,52 @@ class Ball extends SoundObject {
   }
 }
 
+class Drum extends SoundObject {
+  constructor(x, y, vx, vy, r) {
+    super(x, y, vx, vy, r);
+  }
+
+  
+  setup_sound() {
+    this.selectedPreset=_tone_0000_JCLive_sf2_file;
+    var AudioContextFunc = window.AudioContext || window.webkitAudioContext;
+    this.audioContext = new AudioContextFunc();
+    this.player=new WebAudioFontPlayer();
+    this.player.loader.decodeAfterLoading(this.audioContext, '_tone_0000_JCLive_sf2_file');
+  }
+
+  play_collision_sound() {
+    const freqIndex = getFrequencyIndex(this.pos, x0, y0, circleRadius);
+    this.player.queueWaveTable(this.audioContext, this.audioContext.destination, this.selectedPreset,0, 12*5+ petatonic_pitch[freqIndex], 0.5);
+  }
+
+  // setup_sound() {
+  //   this.selectedPreset=_drum_35_0_SBLive_sf2_file;
+  //   var AudioContextFunc = window.AudioContext || window.webkitAudioContext;
+  //   this.audioContext = new AudioContextFunc();
+  //   this.player=new WebAudioFontPlayer();
+  //   this.player.loader.decodeAfterLoading(this.audioContext, '_drum_35_0_SBLive_sf2_file');
+  // }
+
+  // play_collision_sound() {
+  //   this.player.queueWaveTable(this.audioContext, this.audioContext.destination, this.selectedPreset,0, 12*5, 0.5);
+  // }
+
+  draw() {
+    const bar_ratio = 0.2;
+    fill(this.color);
+    ellipse(this.pos.x, this.pos.y, this.r, this.r);
+    const numCircles = 8;
+    const angleStep = TWO_PI / numCircles;
+    const circleRadius = this.r / 2;
+    for (let i = 0; i < numCircles; i++) {
+      const angle = i * angleStep;
+      const x = this.pos.x + cos(angle) * circleRadius * (1 + bar_ratio);
+      const y = this.pos.y + sin(angle) * circleRadius * (1 + bar_ratio);
+      ellipse(x, y, circleRadius * bar_ratio, circleRadius * bar_ratio);
+    }
+  }
+}
 
 
 
@@ -123,8 +169,6 @@ function setup() {
   noStroke();
   frameRate(30);
   ellipseMode(RADIUS);
-
-
 }
 
 
