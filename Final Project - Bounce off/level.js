@@ -11,9 +11,10 @@ function drawArrow(x1, y1, x2, y2, thickness, color) {
   }
 
 class Level {
-    constructor(objects) {
+    constructor(objects, ctx) {
         this.objects = objects;
-        this.setup();
+        this.ctx = ctx;
+        // this.setup();
     }
 
     setup() {
@@ -73,7 +74,7 @@ class Level {
     mousePressed() {
         // mousePressedtime = millis();
         // make object based on the key pressed
-        const ball = new Bouncer(mouseX, mouseY, 0, 0, 20);
+        const ball = new Bouncer(mouseX, mouseY, 0, 0, 20, this.ctx);
         this.bouncers.push(ball);
 
 

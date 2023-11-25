@@ -1,0 +1,14 @@
+[
+    {
+        "name": "level1",
+        "squares": [],
+        "discs": [
+            {
+                "x": 250,
+                "y": 250,
+                "radius": 50,
+                "isCollidable": false
+            }
+        ]
+    }
+]

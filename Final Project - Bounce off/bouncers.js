@@ -2,11 +2,12 @@ let mouseEnergy = 0.1;
 
 class Bouncer {
 
-    constructor(x, y, vx, vy, r) {
+    constructor(x, y, vx, vy, r, ctx) {
         this.pos = createVector(x, y);
         this.vel = createVector(vx, vy);
         this.r = r;
-        this.color = color(random(255), random(200), 50+random(205));
+        this.color = color(random(100), random(200), random(255));
+        this.ctx = ctx
         this.destroyed_objects = [];
     }
 
@@ -46,8 +47,17 @@ class Bouncer {
       }
 
     draw() {
-        fill(this.color);
-        ellipse(this.pos.x, this.pos.y, this.r, this.r);
+        // make an ellipse with color
+        this.ctx.fillStyle = this.color;
+        this.ctx.beginPath();
+        this.ctx.arc(this.pos.x, this.pos.y, this.r, 0, 2 * PI);
+        this.ctx.fill();
+
+        // fill(this.color);
+        
+        // ellipse(this.pos.x, this.pos.y, this.r, this.r);
+        // ellipse(this.pos.x, this.pos.y, this.r, this.r);
+        // fill(this.color);
     }
 
     isOutOfBounds() {
