@@ -14,40 +14,6 @@ function setup() {
     ellipseMode(RADIUS);
     ctx = document.getElementById('defaultCanvas0').getContext('2d');
 
-        // // Fetch level descriptions from JSON file
-        // [
-        //     {   "name": "level1",
-        //         "squares": [
-        //             {
-        //                 "x": 100,
-        //                 "y": 100,
-        //                 "size": 10,
-        //                 "isCollidable": true
-        //             },
-        //             {
-        //                 "x": 500,
-        //                 "y": 100,
-        //                 "size": 100,
-        //                 "isCollidable": true
-        //             },
-        //             {
-        //                 "x": 100,
-        //                 "y": 500,
-        //                 "size": 100,
-        //                 "isCollidable": false
-        //             }
-        //         ],
-        //         "discs": [
-        //             {
-        //                 "x": 250,
-        //                 "y": 250,
-        //                 "radius": 50,
-        //                 "isCollidable": false
-        //             }
-        //         ]
-        //     }
-        // ]
-
     levels = [new Level([], ctx)]
     currentLevel = levels[cur_level_num];
     currentLevel.setup();
@@ -56,38 +22,18 @@ function setup() {
         let response = await fetch('levels.json');
         let data = await response.json();
         return data.map(levelData => {
-            const rectangles = levelData.rectangles.map(rectangleData => new Rectangle(ctx, rectangleData.x, rectangleData.y, rectangleData.width, rectangleData.height, rectangleData.isCollidable, rectangleData.freq));
-            const squares = levelData.squares.map(squareData => new Square(ctx, squareData.x, squareData.y, squareData.size, squareData.isCollidable, squareData.freq));
-            const discs = levelData.discs.map(discData => new Disc(ctx, discData.x, discData.y, discData.radius, discData.isCollidable, discData.freq ));
+            const rectangles = levelData.rectangles.map(rectangleData => new Rectangle(ctx, rectangleData.x, rectangleData.y, rectangleData.width, rectangleData.height, rectangleData.is_hard, rectangleData.freq));
+            const squares = levelData.squares.map(squareData => new Square(ctx, squareData.x, squareData.y, squareData.size, squareData.is_hard, squareData.freq));
+            const discs = levelData.discs.map(discData => new Disc(ctx, discData.x, discData.y, discData.radius, discData.is_hard, discData.freq ));
             return new Level([...squares, ...discs, ...rectangles], ctx);
         });
-        // return levels;
     }
 
-    // levels = 
-    
-    // get promiseresult
     get_levels().then(result => {
         levels = result;
         currentLevel = levels[cur_level_num];
         currentLevel.setup()
-        // levels = result;
     });
-    
-    // console.log(levels);
-
-    // console.log(levels)
-
-
-
-    // // it is a promise
-    // // levels = get_levels();
-
-
-    // currentLevel = levels[cur_level_num];
-    // // console.log(levels);
-
-    // currentLevel.setup();
 }
 
 
@@ -104,6 +50,12 @@ function draw() {
         console.log(cur_level_num);
         console.log(levels.length);
     }
+
+    // write level number at top left
+    fill(0);
+    textSize(32);
+    text(cur_level_num, 10, 30);
+
 
 
     if (mouseIsPressed) {

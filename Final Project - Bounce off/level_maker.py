@@ -19,7 +19,10 @@ class Obstacle:
         }
 
 class Rectangle(Obstacle):
-    def __init__(self, is_hard, freq, x, y, width, height,):
+    def __init__(self, is_hard, freq, x=None, y=None, width=None, height=None, xc=None, yc=None):
+        if xc is not None and yc is not None:
+            x = xc - width // 2
+            y = yc - height // 2
         super().__init__(is_hard, freq, x, y)
         self.width = width
         self.height = height
@@ -35,8 +38,8 @@ class Rectangle(Obstacle):
 
 
 class Square(Rectangle):
-    def __init__(self, is_hard, freq, x, y, size):
-        super().__init__(is_hard, freq, x, y, size, size)
+    def __init__(self, is_hard, freq, x=None, y=None, size=None, xc=None, yc=None):
+        super().__init__(is_hard, freq, x, y, size, size, xc, yc)
 
     def to_dict(self):
         d = super().to_dict()
@@ -132,17 +135,44 @@ note_to_midi = {
 }
 def four_rectangles():
     level4 = Level("four_rectangles")
-    # level4.add_obstacle(Rectangle(False, 60, 400, 200, 500, 50))
-
+    level4.add_obstacle(Rectangle(False, 60, xc=400, yc=200, width=300, height=50))
+    level4.add_obstacle(Rectangle(False, 64, xc=200, yc=400, width=50, height=300))
+    level4.add_obstacle(Rectangle(False, 67, xc=400, yc=600, width=300, height=50))
+    level4.add_obstacle(Rectangle(False, 72, xc=600, yc=400, width=50, height=300))
     return level4
+
+def multiple_vertical_bounces():
+    height = 20
+    width = 500
+    xc = 400
+    level5 = Level("multiple_vertical_bounces")
+    scale = [60, 62, 64, 65, 67, 69, 71, 72]
+    for i in range(8):
+        level5.add_obstacle(Rectangle(False, scale[i], xc=xc, yc=-1*(-1)**(i%2)* (i+4)//2 * 50 + 400, width=width, height=height))
+
+    return level5
+
+def wall_in_between():
+    level6 = Level("wall_in_between")
+    level6.add_obstacle(Rectangle(False, 60, xc=200, yc=600, width=100, height=100))
+    level6.add_obstacle(Rectangle(False, 72, xc=600, yc=600, width=100, height=100))
+
+    # add wall
+    level6.add_obstacle(Rectangle(True, 0, xc=400, yc=600, width=50, height=300))
+    # add bouncer at top
+    level6.add_obstacle(Rectangle(True, 0, xc=400, yc=200, width=300, height=50))
+
+    return level6
 
 if __name__ == "__main__":
     generator = GameLevelGenerator()
 
-    generator.add_level(create_basic_level())
-    generator.add_level(two_rectangles())
-    generator.add_level(disc_and_sphere())
-    generator.add_level(four_rectangles())
+    # generator.add_level(create_basic_level())
+    # generator.add_level(two_rectangles())
+    # generator.add_level(disc_and_sphere())
+    # generator.add_level(four_rectangles())
+    # generator.add_level(multiple_vertical_bounces())
+    generator.add_level(wall_in_between())
 
     # Save to JSON in the current directory
     cur_dir = os.path.dirname(os.path.abspath(__file__))

@@ -1,85 +1,45 @@
 [
     {
-        "name": "one_disc",
-        "squares": [],
-        "discs": [
-            {
-                "x": 400,
-                "y": 400,
-                "is_hard": false,
-                "freq": 60,
-                "color": "grey",
-                "radius": 100
-            }
-        ],
-        "rectangles": []
-    },
-    {
-        "name": "two_rectangles",
+        "name": "wall_in_between",
         "squares": [],
         "discs": [],
         "rectangles": [
             {
-                "x": 100,
-                "y": 100,
+                "x": 150,
+                "y": 550,
                 "is_hard": false,
                 "freq": 60,
                 "color": "grey",
-                "width": 50,
-                "height": 500
+                "width": 100,
+                "height": 100
             },
             {
-                "x": 500,
-                "y": 100,
+                "x": 550,
+                "y": 550,
                 "is_hard": false,
                 "freq": 72,
                 "color": "grey",
+                "width": 100,
+                "height": 100
+            },
+            {
+                "x": 375,
+                "y": 450,
+                "is_hard": true,
+                "freq": 0,
+                "color": "black",
                 "width": 50,
-                "height": 500
+                "height": 300
+            },
+            {
+                "x": 250,
+                "y": 175,
+                "is_hard": true,
+                "freq": 0,
+                "color": "black",
+                "width": 300,
+                "height": 50
             }
         ]
-    },
-    {
-        "name": "disc_and_sphere",
-        "squares": [
-            {
-                "x": 100,
-                "y": 100,
-                "is_hard": false,
-                "freq": 55,
-                "color": "grey",
-                "width": 50,
-                "height": 50,
-                "size": 50
-            }
-        ],
-        "discs": [
-            {
-                "x": 400,
-                "y": 400,
-                "is_hard": false,
-                "freq": 60,
-                "color": "grey",
-                "radius": 100
-            }
-        ],
-        "rectangles": [
-            {
-                "x": 100,
-                "y": 100,
-                "is_hard": false,
-                "freq": 55,
-                "color": "grey",
-                "width": 50,
-                "height": 50,
-                "size": 50
-            }
-        ]
-    },
-    {
-        "name": "four_rectangles",
-        "squares": [],
-        "discs": [],
-        "rectangles": []
     }
 ]
