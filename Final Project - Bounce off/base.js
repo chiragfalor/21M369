@@ -56,9 +56,10 @@ function setup() {
         let response = await fetch('levels.json');
         let data = await response.json();
         return data.map(levelData => {
-            const squares = levelData.squares.map(squareData => new Square(squareData.x, squareData.y, squareData.size, squareData.isCollidable, ctx));
-            const discs = levelData.discs.map(discData => new Disc(discData.x, discData.y, discData.radius, discData.isCollidable, ctx));
-            return new Level([...squares, ...discs], ctx);
+            const rectangles = levelData.rectangles.map(rectangleData => new Rectangle(ctx, rectangleData.x, rectangleData.y, rectangleData.width, rectangleData.height, rectangleData.isCollidable, rectangleData.freq));
+            const squares = levelData.squares.map(squareData => new Square(ctx, squareData.x, squareData.y, squareData.size, squareData.isCollidable, squareData.freq));
+            const discs = levelData.discs.map(discData => new Disc(ctx, discData.x, discData.y, discData.radius, discData.isCollidable, discData.freq ));
+            return new Level([...squares, ...discs, ...rectangles], ctx);
         });
         // return levels;
     }
@@ -91,7 +92,19 @@ function setup() {
 
 
 function draw() {
-    currentLevel.update();
+    completed = currentLevel.update();
+    if (completed) {
+        cur_level_num++;
+        if (cur_level_num >= levels.length) {
+            cur_level_num = 0;
+        }
+        currentLevel = levels[cur_level_num];
+        currentLevel.setup();
+        console.log("level completed");
+        console.log(cur_level_num);
+        console.log(levels.length);
+    }
+
 
     if (mouseIsPressed) {
         currentLevel.mouseIsPressed();

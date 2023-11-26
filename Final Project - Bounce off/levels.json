@@ -1,14 +1,85 @@
 [
     {
-        "name": "level1",
+        "name": "one_disc",
         "squares": [],
         "discs": [
             {
-                "x": 250,
-                "y": 250,
-                "radius": 50,
-                "isCollidable": false
+                "x": 400,
+                "y": 400,
+                "is_hard": false,
+                "freq": 60,
+                "color": "grey",
+                "radius": 100
+            }
+        ],
+        "rectangles": []
+    },
+    {
+        "name": "two_rectangles",
+        "squares": [],
+        "discs": [],
+        "rectangles": [
+            {
+                "x": 100,
+                "y": 100,
+                "is_hard": false,
+                "freq": 60,
+                "color": "grey",
+                "width": 50,
+                "height": 500
+            },
+            {
+                "x": 500,
+                "y": 100,
+                "is_hard": false,
+                "freq": 72,
+                "color": "grey",
+                "width": 50,
+                "height": 500
             }
         ]
+    },
+    {
+        "name": "disc_and_sphere",
+        "squares": [
+            {
+                "x": 100,
+                "y": 100,
+                "is_hard": false,
+                "freq": 55,
+                "color": "grey",
+                "width": 50,
+                "height": 50,
+                "size": 50
+            }
+        ],
+        "discs": [
+            {
+                "x": 400,
+                "y": 400,
+                "is_hard": false,
+                "freq": 60,
+                "color": "grey",
+                "radius": 100
+            }
+        ],
+        "rectangles": [
+            {
+                "x": 100,
+                "y": 100,
+                "is_hard": false,
+                "freq": 55,
+                "color": "grey",
+                "width": 50,
+                "height": 50,
+                "size": 50
+            }
+        ]
+    },
+    {
+        "name": "four_rectangles",
+        "squares": [],
+        "discs": [],
+        "rectangles": []
     }
 ]

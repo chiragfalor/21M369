@@ -1,5 +1,5 @@
 class Obstacle {
-    constructor(x, y, color, is_hard, ctx, sobj) {
+    constructor(ctx, x, y, color, is_hard, sobj) {
         this.x = x;
         this.y = y;
         this.color = color;
@@ -27,15 +27,15 @@ class Obstacle {
 
 
 class Rectangle extends Obstacle{
-    constructor(x, y, width, height, is_hard, ctx) {
+    constructor(ctx, x, y, width, height, is_hard, freq=60) {
         if (is_hard) {
             var color = "black";
             var sobj = new Snare();
         } else {
             var color = "grey";
-            var sobj = new Piano();
+            var sobj = new Piano(freq);
         }
-        super(x, y, color, is_hard, ctx, sobj);
+        super(ctx, x, y, color, is_hard, sobj);
         this.width = width;
         this.height = height;
     }
@@ -63,13 +63,13 @@ class Rectangle extends Obstacle{
 }
 
 class Square extends Rectangle {
-    constructor(x, y, size, is_hard, ctx) {
-        super(x, y, size, size, is_hard, ctx);
+    constructor(ctx, x, y, size, is_hard, freq=60) {
+        super(ctx, x, y, size, size, is_hard, freq);
     }
 }
 
 class Line extends Obstacle{
-    constructor(x1, y1, x2, y2, is_hard, ctx) {
+    constructor(ctx, x1, y1, x2, y2, is_hard) {
         if (is_hard) {
             var color = "black";
             var sobj = new Snare();
@@ -78,7 +78,7 @@ class Line extends Obstacle{
             var sobj = new Piano();
         }
 
-        super(x1, y1, color, is_hard, ctx, sobj);
+        super(ctx, x1, y1, color, is_hard, sobj);
         this.x2 = x2;
         this.y2 = y2
     }
@@ -93,16 +93,16 @@ class Line extends Obstacle{
 }
 
 class Disc extends Obstacle{
-    constructor(x, y, radius, is_hard, ctx) {
+    constructor(ctx, x, y, radius, is_hard, freq=60) {
         if (is_hard) {
             var color = "black";
             var sobj = new Snare();
         } else {
             var color = "grey";
-            var sobj = new Piano();
+            var sobj = new Piano(freq);
         }
 
-        super(x, y, color, is_hard, ctx, sobj);
+        super(ctx, x, y, color, is_hard, sobj);
         this.radius = radius;
     }
 

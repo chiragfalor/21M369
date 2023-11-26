@@ -42,6 +42,12 @@ class Level {
             bouncer.update();
             // if any bouncer is out of bounds, remove it
             if (bouncer.isOutOfBounds()) {
+                // check if all not is_hard objects are destroyed
+                // ie all remaining objects are hard
+                if (this.objects.every(object => object.is_hard)) {
+                    return true;
+                }
+                
                 // add destroyed objects to the objects array
                 this.objects = this.objects.concat(bouncer.destroyed_objects);
                 this.bouncers.splice(i, 1);
@@ -66,7 +72,7 @@ class Level {
             // }
         }
         this.bouncers.forEach(bouncer => bouncer.update());
-        console.log(this.bouncers.length);
+        // console.log(this.bouncers.length);
 
 
     }

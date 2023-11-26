@@ -14,7 +14,7 @@ class SoundObject {
 }
 
 class Piano extends SoundObject {
-    constructor(duration=0.2, pitch = 60) {
+    constructor(pitch = 60, duration=0.5 ) {
         super();
         this.duration = duration;
         this.pitch = pitch;
