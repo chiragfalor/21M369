@@ -25,7 +25,8 @@ function setup() {
             const rectangles = levelData.rectangles.map(rectangleData => new Rectangle(ctx, rectangleData.x, rectangleData.y, rectangleData.width, rectangleData.height, rectangleData.is_hard, rectangleData.freq));
             const squares = levelData.squares.map(squareData => new Square(ctx, squareData.x, squareData.y, squareData.size, squareData.is_hard, squareData.freq));
             const discs = levelData.discs.map(discData => new Disc(ctx, discData.x, discData.y, discData.radius, discData.is_hard, discData.freq ));
-            return new Level([...squares, ...discs, ...rectangles], ctx);
+            const bouncer_size = levelData.bouncer_size;
+            return new Level([...squares, ...discs, ...rectangles], bouncer_size, ctx);
         });
     }
 

@@ -1,3 +1,8 @@
+function get_color(freq) {
+    var hue = (freq - 55) * 10;
+    return "hsl(" + hue + ", 100%, 50%)";
+}
+
 class Obstacle {
     constructor(ctx, x, y, color, is_hard, sobj) {
         this.x = x;
@@ -7,6 +12,8 @@ class Obstacle {
         this.ctx = ctx;
         this.sobj = sobj;
     }
+
+
 
     setup() {
         this.draw();
@@ -32,7 +39,10 @@ class Rectangle extends Obstacle{
             var color = "black";
             var sobj = new Snare();
         } else {
-            var color = "grey";
+            // get color from frequency with color based on hue
+            var color = get_color(freq);
+            
+            // var color = "grey";
             var sobj = new Piano(freq);
         }
         super(ctx, x, y, color, is_hard, sobj);
@@ -41,6 +51,7 @@ class Rectangle extends Obstacle{
     }
 
     draw() {
+        // console.log(this.color);
         this.ctx.fillStyle = this.color;
         this.ctx.fillRect(this.x, this.y, this.width, this.height);
     }
@@ -74,7 +85,7 @@ class Line extends Obstacle{
             var color = "black";
             var sobj = new Snare();
         } else {
-            var color = "grey";
+            var color = get_color(freq);
             var sobj = new Piano();
         }
 
@@ -98,7 +109,7 @@ class Disc extends Obstacle{
             var color = "black";
             var sobj = new Snare();
         } else {
-            var color = "grey";
+            var color = get_color(freq);
             var sobj = new Piano(freq);
         }
 

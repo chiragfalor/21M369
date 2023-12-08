@@ -14,6 +14,13 @@ class Bouncer {
     
     getBallVelocity(mouseX, mouseY) {
     const v = this.propVelocity(this.pos.x, this.pos.y, mouseX, mouseY);
+    // bound the min 5, max 20
+    if (v.mag() < 1) {
+      v.setMag(1);
+    }
+    if (v.mag() > 10) {
+      v.setMag(10);
+    }
     return v;
     }
   
@@ -52,12 +59,6 @@ class Bouncer {
         this.ctx.beginPath();
         this.ctx.arc(this.pos.x, this.pos.y, this.r, 0, 2 * PI);
         this.ctx.fill();
-
-        // fill(this.color);
-        
-        // ellipse(this.pos.x, this.pos.y, this.r, this.r);
-        // ellipse(this.pos.x, this.pos.y, this.r, this.r);
-        // fill(this.color);
     }
 
     isOutOfBounds() {
@@ -69,6 +70,8 @@ class Bouncer {
             object.bounce(this);
             if (!object.is_hard) {
                 this.destroyed_objects.push(object);
+                // take color of object
+                this.color = object.color;
                 return true;
             }
         }

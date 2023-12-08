@@ -11,8 +11,9 @@ function drawArrow(x1, y1, x2, y2, thickness, color) {
   }
 
 class Level {
-    constructor(objects, ctx) {
+    constructor(objects, bouncer_size, ctx) {
         this.objects = objects;
+        this.bouncer_size = bouncer_size;
         this.ctx = ctx;
         // this.setup();
     }
@@ -80,7 +81,8 @@ class Level {
     mousePressed() {
         // mousePressedtime = millis();
         // make object based on the key pressed
-        const ball = new Bouncer(mouseX, mouseY, 0, 0, 20, this.ctx);
+        const ball = new Bouncer(mouseX, mouseY, 0, 0, this.bouncer_size, this.ctx);
+        console.log(this.bouncer_size);
         this.bouncers.push(ball);
 
 
@@ -94,9 +96,9 @@ class Level {
         
         // draw the velocity vector
         const v = ball.getBallVelocity(mouseX, mouseY);
-
+        const arrowLen = 7;
         // draw the velocity vector
-        drawArrow(ball.pos.x, ball.pos.y, ball.pos.x+v.x*5, ball.pos.y+v.y*5, 3, color(0, 255, 0));
+        drawArrow(ball.pos.x, ball.pos.y, ball.pos.x+v.x*arrowLen, ball.pos.y+v.y*arrowLen, 3, color(0, 255, 0));
 
     }
 
