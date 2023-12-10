@@ -2,6 +2,7 @@ let currentLevel;
 let cur_level_num = 0;
 // let levels = [];
 let demo;
+const show_demo = false;
 
 function setup() {
     createCanvas(800, 800);
@@ -21,8 +22,10 @@ function setup() {
             const rectangles = levelData.rectangles.map(rectangleData => new Rectangle(ctx, rectangleData.x, rectangleData.y, rectangleData.width, rectangleData.height, rectangleData.is_hard, rectangleData.freq));
             const squares = levelData.squares.map(squareData => new Square(ctx, squareData.x, squareData.y, squareData.size, squareData.is_hard, squareData.freq));
             const discs = levelData.discs.map(discData => new Disc(ctx, discData.x, discData.y, discData.radius, discData.is_hard, discData.freq ));
+            const triangles = levelData.triangles.map(triangleData => new Triangle(ctx, triangleData.x, triangleData.y, triangleData.x2, triangleData.y2, triangleData.x3, triangleData.y3, triangleData.is_hard, triangleData.freq));
             const bouncer_size = levelData.bouncer_size;
-            return new Level([...squares, ...discs, ...rectangles], bouncer_size, ctx);
+            const objects = [...squares, ...discs, ...rectangles, ...triangles];
+            return new Level(objects, bouncer_size, ctx);
         });
     }
 
@@ -31,12 +34,12 @@ function setup() {
         currentLevel = levels[cur_level_num];
         currentLevel.setup()
     });
-    // play the demo.gif over the canvas at the start
+
+    if (show_demo) {
     demo = createImg('demo.gif', 'demo');
     demo.position(0, 0);
     demo.size(width, height);
-    // remove after the first click
-    // demo.style('z-index', '-1');
+    }
 
 
 }

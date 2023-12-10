@@ -62,13 +62,29 @@ class Line(Obstacle):
     
 
 class Disc(Obstacle):
-    def __init__(self, is_hard, freq, x, y, radius  ):
+    def __init__(self, is_hard, freq, x, y, radius):
         super().__init__(is_hard, freq, x, y)
         self.radius = radius
 
     def to_dict(self):
         d = super().to_dict()
         d["radius"] = self.radius
+        return d
+    
+class Triangle(Obstacle):
+    def __init__(self, is_hard, freq, x1, y1, x2, y2, x3, y3):
+        super().__init__(is_hard, freq, x1, y1)
+        self.x2 = x2
+        self.y2 = y2
+        self.x3 = x3
+        self.y3 = y3
+    
+    def to_dict(self):
+        d = super().to_dict()
+        d["x2"] = self.x2
+        d["y2"] = self.y2
+        d["x3"] = self.x3
+        d["y3"] = self.y3
         return d
 
 class Level:
@@ -89,6 +105,7 @@ class Level:
             "squares": [square.to_dict() for square in self.obstacles if isinstance(square, Square)],
             "discs": [disc.to_dict() for disc in self.obstacles if isinstance(disc, Disc)],
             "rectangles": [rectangle.to_dict() for rectangle in self.obstacles if isinstance(rectangle, Rectangle)],
+            "triangles": [triangle.to_dict() for triangle in self.obstacles if isinstance(triangle, Triangle)],
             "bouncer_size": self.bouncer_size,
         }
 
@@ -221,19 +238,25 @@ def ode_to_joy():
                                   width=width, height=20))
     return level8
 
+def create_simple_triangle():
+    level9 = Level("simple_triangle")
+    level9.add_obstacle(Triangle(False, 60, 200, 100, 400, 100, 300, 300))
+    return level9
+
 
 
 if __name__ == "__main__":
     generator = GameLevelGenerator()
 
-    generator.add_level(create_basic_level())
-    generator.add_level(two_rectangles())
-    generator.add_level(disc_and_sphere())
-    generator.add_level(four_rectangles())
-    generator.add_level(multiple_vertical_bounces())
-    generator.add_level(wall_in_between())
-    generator.add_level(multiple_horizontal_bounces())
-    generator.add_level(ode_to_joy())
+    # generator.add_level(create_basic_level())
+    # generator.add_level(two_rectangles())
+    # generator.add_level(disc_and_sphere())
+    # generator.add_level(four_rectangles())
+    # generator.add_level(multiple_vertical_bounces())
+    # generator.add_level(wall_in_between())
+    # generator.add_level(multiple_horizontal_bounces())
+    # generator.add_level(ode_to_joy())
+    generator.add_level(create_simple_triangle())
 
     # Save to JSON in the current directory
     cur_dir = os.path.dirname(os.path.abspath(__file__))
