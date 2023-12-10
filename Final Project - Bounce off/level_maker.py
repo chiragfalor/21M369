@@ -18,7 +18,8 @@ note_to_midi = {
     "A#": 70,
     "B": 71
 }
-scale = [0, 2, 4, 5, 7, 9, 11, 12]
+major_scale = [-1, 0, 2, 4, 5, 7, 9, 11, 12, 14, 16]
+minor_scale = [-1, 0, 2, 3, 5, 7, 8, 10, 12]
 pentatonic_scale = [0, 2, 4, 7, 9, 12]
 chord = [0, 4, 7, 12]
 
@@ -57,7 +58,7 @@ def multiple_vertical_bounces():
     width = 500
     xc = 400
     level5 = Level("multiple_vertical_bounces")
-    C_scale = [60+s for s in scale] # C major scale
+    C_scale = [60+s for s in major_scale[1:]] # C major scale
     for i in range(8):
         level5.add_obstacle(Rectangle(False, C_scale[i], xc=xc, yc=-1*(-1)**(i%2)* (i+4)//2 * 50 + 400, width=width, height=height))
 
@@ -81,7 +82,7 @@ def multiple_horizontal_bounces():
     x1 = 200
     x2 = 600
     level7 = Level("multiple_horizontal_bounces")
-    A_scale = [69+s for s in scale] # A major scale
+    A_scale = [69+s for s in major_scale[1:]] # A major scale
     for i in range(8):
         level7.add_obstacle(Rectangle(False, A_scale[i], xc=x1 if i%2 == 0 else x2, yc=200+(i) * 60, width=width, height=height))
 
@@ -90,8 +91,8 @@ def multiple_horizontal_bounces():
 def ode_to_joy():
     level8 = Level("ode_to_joy", bouncer_size=15)
     # main chorus
-    chorus = [2, 2, 3, 4, 4, 3, 2, 1, 0, 0, 1]
-    extra = [2, 1, 0, 0]
+    chorus = [3, 3, 4, 5, 5, 4, 3, 2, 1, 1, 2]
+    extra = [3, 2, 1, 1]
     key = 69
 
     left_x = 250
@@ -100,27 +101,27 @@ def ode_to_joy():
     width = 200
     init_y = 50
     for i in range(len(chorus)):
-        level8.add_obstacle(Rectangle(False, key + scale[chorus[i]], 
+        level8.add_obstacle(Rectangle(False, key + major_scale[chorus[i]], 
                                       xc=left_x if i%2 == 0 else right_x, 
                                       yc=init_y+(i) * (height // 2 + 10), 
                                       width=width, height=height))
     # add vertical rectangle
-    level8.add_obstacle(Rectangle(False, key + scale[extra[0]], 
+    level8.add_obstacle(Rectangle(False, key + major_scale[extra[0]], 
                                   xc=right_x - 50, 
                                   yc=init_y + len(chorus) * (height // 2 + 10) + 50,
                                   width=80, height=200))
     # add horizontal rectangle
-    level8.add_obstacle(Rectangle(False, key + scale[extra[1]], 
+    level8.add_obstacle(Rectangle(False, key + major_scale[extra[1]], 
                                   xc=left_x,
                                   yc=init_y + len(chorus) * (height // 2 + 10)+ 60,
                                   width=width, height=height))
     # add vertical rectangle
-    level8.add_obstacle(Rectangle(False, key + scale[extra[2]], 
+    level8.add_obstacle(Rectangle(False, key + major_scale[extra[2]], 
                                   xc=right_x + 50, 
                                   yc=init_y + len(chorus) * (height // 2 + 10)+ 50,
                                   width=80, height=200))
     # add horizontal rectangle
-    level8.add_obstacle(Rectangle(False, key + scale[extra[3]], 
+    level8.add_obstacle(Rectangle(False, key + major_scale[extra[3]], 
                                   xc=right_x,
                                   yc=init_y + len(chorus) * (height // 2 + 10) + 190,
                                   width=width, height=20))
@@ -135,9 +136,34 @@ def create_four_triangles():
     return level9
 
 def basic_musical_level():
-    A_scale = [69+s for s in scale] # A major scale
-    mp = MusicalPhrase("test", A_scale, [1]*len(A_scale))
+    # A_scale = [69+s for s in scale] # A major scale
+    mp = MusicalPhrase("test", major_scale, [1]*len(major_scale), tempo=200, root_key=69)
     lvl = make_musical_level(mp)
+    lvl.bouncer_size = 10
+    return lvl
+
+def twinkle_twinkle():
+    twinkle_notes = [1,1, 5,5, 6,6, 5, 4,4, 3,3, 2,2, 1]
+    twinkle_durations = [1,1, 1,1, 1,1, 2, 1,1, 1,1, 1,1, 2]
+    dir_prefs = [0,0, 0,0, 1,0, 0, 0,0, 0,0, 1,0, 0]
+    notes = [major_scale[note] for note in twinkle_notes]
+    mp = MusicalPhrase("twinkle_twinkle", notes, twinkle_durations, tempo=200, root_key=69)
+    lvl = make_musical_level(mp, direction_preferences=dir_prefs)
+    lvl.bouncer_size = 10
+    return lvl
+
+
+
+def composition_cfalor_051():
+    pass
+
+def washing_machine_compostion():
+    melody = [5, 8,7,6, 5, 3, 4,5,6, 2,3,4, 3, 5, 5, 8,7,6, 5, 8, 8,9,8, 7,6,7, 8]
+    durations = [3, 1,1,1, 3, 3, 1,1,1, 1,1,1, 3, 3, 3, 1,1,1, 3, 3, 1,1,1, 1,1,1, 3]
+    dir_prefs = [0, 0,1,0, 0, 0, 1,0,0, 0,1,0, 1, 0, 0, 1,0,0, 0, 1, 1,1,0, 1,0,0, 0]
+    notes = [major_scale[note] for note in melody]
+    mp = MusicalPhrase("washhing_maching", notes, durations, tempo=100, root_key=65)
+    lvl = make_musical_level(mp, direction_preferences=dir_prefs, scale=50)
     lvl.bouncer_size = 10
     return lvl
 
@@ -148,18 +174,20 @@ def basic_musical_level():
 if __name__ == "__main__":
     generator = GameLevelGenerator()
 
-    # generator.add_level(create_basic_level())
-    # generator.add_level(two_rectangles())
-    # generator.add_level(disc_and_sphere())
-    # generator.add_level(four_rectangles())
-    # generator.add_level(multiple_vertical_bounces())
-    # generator.add_level(wall_in_between())
-    # generator.add_level(multiple_horizontal_bounces())
-    # generator.add_level(ode_to_joy())
-    # generator.add_level(create_four_triangles())
+    generator.add_level(create_basic_level())
+    generator.add_level(two_rectangles())
+    generator.add_level(disc_and_sphere())
+    generator.add_level(four_rectangles())
+    generator.add_level(multiple_vertical_bounces())
+    generator.add_level(wall_in_between())
+    generator.add_level(multiple_horizontal_bounces())
+    generator.add_level(ode_to_joy())
+    generator.add_level(create_four_triangles())
 
     
     generator.add_level(basic_musical_level())
+    generator.add_level(twinkle_twinkle())
+    generator.add_level(washing_machine_compostion())
 
 
     # Save to JSON in the current directory
