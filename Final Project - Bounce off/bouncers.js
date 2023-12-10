@@ -14,9 +14,9 @@ class Bouncer {
     
     getBallVelocity(mouseX, mouseY) {
     const v = this.propVelocity(this.pos.x, this.pos.y, mouseX, mouseY);
-    // bound the min 5, max 20
-    if (v.mag() < 1) {
-      v.setMag(1);
+    // bound the velocity
+    if (v.mag() < 2) {
+      v.setMag(2);
     }
     if (v.mag() > 10) {
       v.setMag(10);
@@ -34,6 +34,10 @@ class Bouncer {
     const dx = -(mouseX - ballx);
     const dy = -(mouseY - bally);
     const v = createVector(dx*mouseEnergy, dy*mouseEnergy);
+    // if v is 0, set it to a small value in the x direction
+    if (v.mag() <= 0.1) {
+      v.x = 0.1;
+    }
     return v;
   }
 

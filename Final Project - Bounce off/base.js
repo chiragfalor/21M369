@@ -1,11 +1,7 @@
 let currentLevel;
 let cur_level_num = 0;
 // let levels = [];
-// think about sonic design
-// what are collision sounds, what background music, how sounds change as we progress through levels
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+let demo;
 
 function setup() {
     createCanvas(800, 800);
@@ -35,11 +31,20 @@ function setup() {
         currentLevel = levels[cur_level_num];
         currentLevel.setup()
     });
+    // play the demo.gif over the canvas at the start
+    demo = createImg('demo.gif', 'demo');
+    demo.position(0, 0);
+    demo.size(width, height);
+    // remove after the first click
+    // demo.style('z-index', '-1');
+
+
 }
 
 
 function draw() {
     completed = currentLevel.update();
+
     if (completed) {
         cur_level_num++;
         if (cur_level_num >= levels.length) {
@@ -47,9 +52,7 @@ function draw() {
         }
         currentLevel = levels[cur_level_num];
         currentLevel.setup();
-        console.log("level completed");
-        console.log(cur_level_num);
-        console.log(levels.length);
+        console.log("level completed: " + cur_level_num);
     }
 
     // write level number at top left
@@ -60,7 +63,9 @@ function draw() {
 
 
     if (mouseIsPressed) {
+        if (!demo) {
         currentLevel.mouseIsPressed();
+        }
     }
 }
 
@@ -71,11 +76,23 @@ function keyPressed() {
 }
   
 function mousePressed() {
-currentLevel.mousePressed();
+    // if demo is still playing don't do anything
+    if (!demo) {
+        currentLevel.mousePressed();
+    }
+    console.log("mouse pressed");
+// currentLevel.mousePressed();
 }
 
 function mouseReleased() {
-currentLevel.mouseReleased();
+    if (demo) {
+        demo.remove();
+        demo = null;
+        return;
+    } else {
+        currentLevel.mouseReleased();
+    }
+// currentLevel.mouseReleased();
 }
   
     

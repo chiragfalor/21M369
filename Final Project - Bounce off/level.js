@@ -32,7 +32,7 @@ class Level {
     update() {
         // clear the canvas
         // clear();
-        background(200, 100, 100, 100);
+        background(200, 100, 100, 500);
 
         // update the objects
         this.objects.forEach(object => object.update());
@@ -73,8 +73,6 @@ class Level {
             // }
         }
         this.bouncers.forEach(bouncer => bouncer.update());
-        // console.log(this.bouncers.length);
-
 
     }
 
@@ -82,7 +80,6 @@ class Level {
         // mousePressedtime = millis();
         // make object based on the key pressed
         const ball = new Bouncer(mouseX, mouseY, 0, 0, this.bouncer_size, this.ctx);
-        console.log(this.bouncer_size);
         this.bouncers.push(ball);
 
 
