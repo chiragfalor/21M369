@@ -1,124 +1,27 @@
-import json
 import os
+from Level import *
 
-class Obstacle:
-    def __init__(self, is_hard, freq, x, y):
-        self.x = x
-        self.y = y
-        self.is_hard = is_hard
-        self.freq = freq
-        self.color = "black" if is_hard else "grey"
+from musical_levels import make_musical_level, MusicalPhrase
 
-    def to_dict(self):
-        return {
-            "x": self.x,
-            "y": self.y,
-            "is_hard": self.is_hard,
-            "freq": self.freq,
-            "color": self.color
-        }
+# notes to midi:
+note_to_midi = {
+    "C": 60,
+    "C#": 61,
+    "D": 62,
+    "D#": 63,
+    "E": 64,
+    "F": 65,
+    "F#": 66,
+    "G": 67,
+    "G#": 68,
+    "A": 69,
+    "A#": 70,
+    "B": 71
+}
+scale = [0, 2, 4, 5, 7, 9, 11, 12]
+pentatonic_scale = [0, 2, 4, 7, 9, 12]
+chord = [0, 4, 7, 12]
 
-class Rectangle(Obstacle):
-    def __init__(self, is_hard, freq, x=None, y=None, width=None, height=None, xc=None, yc=None):
-        if xc is not None and yc is not None:
-            x = xc - width // 2
-            y = yc - height // 2
-        super().__init__(is_hard, freq, x, y)
-        self.width = width
-        self.height = height
-
-    def to_dict(self):
-        d = super().to_dict()
-        d["width"] = self.width
-        d["height"] = self.height
-        return d
-
-    
-
-
-
-class Square(Rectangle):
-    def __init__(self, is_hard, freq, x=None, y=None, size=None, xc=None, yc=None):
-        super().__init__(is_hard, freq, x, y, size, size, xc, yc)
-
-    def to_dict(self):
-        d = super().to_dict()
-        d["size"] = self.width
-        return d
-    
-
-class Line(Obstacle):
-    def __init__(self, is_hard, freq, x1, y1, x2, y2):
-        super().__init__(is_hard, freq,x1, y1)
-        self.x2 = x2
-        self.y2 = y2
-
-    def to_dict(self):
-        d = super().to_dict()
-        d["x2"] = self.x2
-        d["y2"] = self.y2
-        return d
-
-    
-
-class Disc(Obstacle):
-    def __init__(self, is_hard, freq, x, y, radius):
-        super().__init__(is_hard, freq, x, y)
-        self.radius = radius
-
-    def to_dict(self):
-        d = super().to_dict()
-        d["radius"] = self.radius
-        return d
-    
-class Triangle(Obstacle):
-    def __init__(self, is_hard, freq, x1, y1, x2, y2, x3, y3):
-        super().__init__(is_hard, freq, x1, y1)
-        self.x2 = x2
-        self.y2 = y2
-        self.x3 = x3
-        self.y3 = y3
-    
-    def to_dict(self):
-        d = super().to_dict()
-        d["x2"] = self.x2
-        d["y2"] = self.y2
-        d["x3"] = self.x3
-        d["y3"] = self.y3
-        return d
-
-class Level:
-    def __init__(self, name, bouncer_size=20):
-        self.name = name
-        self.obstacles = []
-        self.bouncer_size = bouncer_size
-
-    def add_obstacle(self, obstacle):
-        self.obstacles.append(obstacle)
-
-    def to_dict(self):
-        # squares = [obstacle for obstacle in self.obstacles if isinstance(obstacle, Square)]
-        # discs = [obstacle for obstacle in self.obstacles if isinstance(obstacle, Disc)]
-    
-        return {
-            "name": self.name,
-            "squares": [square.to_dict() for square in self.obstacles if isinstance(square, Square)],
-            "discs": [disc.to_dict() for disc in self.obstacles if isinstance(disc, Disc)],
-            "rectangles": [rectangle.to_dict() for rectangle in self.obstacles if isinstance(rectangle, Rectangle)],
-            "triangles": [triangle.to_dict() for triangle in self.obstacles if isinstance(triangle, Triangle)],
-            "bouncer_size": self.bouncer_size,
-        }
-
-class GameLevelGenerator:
-    def __init__(self):
-        self.levels = []
-
-    def add_level(self, level):
-        self.levels.append(level)
-
-    def save_to_json(self, file_name):
-        with open(file_name, 'w') as file:
-            json.dump([level.to_dict() for level in self.levels], file, indent=4)
 
 def create_basic_level():
     level1 = Level("one_disc")
@@ -140,22 +43,7 @@ def disc_and_sphere():
     level3.add_obstacle(Disc(False, 60, 400, 400, 100, ))
     level3.add_obstacle(Square(False, 55, 100, 100, 50, ))
     return level3
-# notes to midi:
-note_to_midi = {
-    "C": 60,
-    "C#": 61,
-    "D": 62,
-    "D#": 63,
-    "E": 64,
-    "F": 65,
-    "F#": 66,
-    "G": 67,
-    "G#": 68,
-    "A": 69,
-    "A#": 70,
-    "B": 71
-}
-scale = [0, 2, 4, 5, 7, 9, 11, 12]
+
 def four_rectangles():
     level4 = Level("four_rectangles")
     level4.add_obstacle(Rectangle(False, 60, xc=400, yc=200, width=300, height=50))
@@ -238,10 +126,22 @@ def ode_to_joy():
                                   width=width, height=20))
     return level8
 
-def create_simple_triangle():
-    level9 = Level("simple_triangle")
-    level9.add_obstacle(Triangle(False, 60, 200, 100, 400, 100, 300, 300))
+def create_four_triangles():
+    level9 = Level("four_triangles", bouncer_size=10)
+    level9.add_obstacle(RightTriangle(False, 60, 600, 200, 100, 135))
+    level9.add_obstacle(RightTriangle(False, 64, 200, 200, 100, 45))
+    level9.add_obstacle(RightTriangle(False, 67, 200, 600, 100, -45))    
+    level9.add_obstacle(RightTriangle(False, 72, 600, 600, 100, -135))
     return level9
+
+def basic_musical_level():
+    A_scale = [69+s for s in scale] # A major scale
+    mp = MusicalPhrase("test", A_scale, [1]*len(A_scale))
+    lvl = make_musical_level(mp)
+    lvl.bouncer_size = 10
+    return lvl
+
+
 
 
 
@@ -256,7 +156,11 @@ if __name__ == "__main__":
     # generator.add_level(wall_in_between())
     # generator.add_level(multiple_horizontal_bounces())
     # generator.add_level(ode_to_joy())
-    generator.add_level(create_simple_triangle())
+    # generator.add_level(create_four_triangles())
+
+    
+    generator.add_level(basic_musical_level())
+
 
     # Save to JSON in the current directory
     cur_dir = os.path.dirname(os.path.abspath(__file__))
