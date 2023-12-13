@@ -42,7 +42,7 @@ def two_rectangles():
 def disc_and_sphere():
     level3 = Level("disc_and_sphere")
     level3.add_obstacle(Disc(False, 60, 400, 400, 100, ))
-    level3.add_obstacle(Square(False, 55, 100, 100, 50, ))
+    level3.add_obstacle(Rectangle(False, 55, 100, 100, 50, 50, ))
     return level3
 
 def four_rectangles():
@@ -137,18 +137,18 @@ def create_four_triangles():
 
 def basic_musical_level():
     # A_scale = [69+s for s in scale] # A major scale
-    mp = MusicalPhrase("test", major_scale, [1]*len(major_scale), tempo=200, root_key=69)
-    lvl = make_musical_level(mp)
+    mp = MusicalPhrase("test", major_scale[1:], [1]*len(major_scale[1:]), tempo=100, root_key=69)
+    lvl = make_musical_level(mp, start_pos = (-50, 200), scale=150)
     lvl.bouncer_size = 10
     return lvl
 
 def twinkle_twinkle():
     twinkle_notes = [1,1, 5,5, 6,6, 5, 4,4, 3,3, 2,2, 1]
     twinkle_durations = [1,1, 1,1, 1,1, 2, 1,1, 1,1, 1,1, 2]
-    dir_prefs = [0,0, 0,0, 1,0, 0, 0,0, 0,0, 1,0, 0]
+    dir_prefs = [0,0, 0,0, 1,0, 1, 1,1, 1,0, 1,0, 0]
     notes = [major_scale[note] for note in twinkle_notes]
-    mp = MusicalPhrase("twinkle_twinkle", notes, twinkle_durations, tempo=200, root_key=69)
-    lvl = make_musical_level(mp, direction_preferences=dir_prefs)
+    mp = MusicalPhrase("twinkle_twinkle", notes, twinkle_durations, tempo=100, root_key=69)
+    lvl = make_musical_level(mp, direction_preferences=dir_prefs, scale=100, start_pos=[50, 350])
     lvl.bouncer_size = 10
     return lvl
 
@@ -168,6 +168,41 @@ def washing_machine_compostion():
     return lvl
 
 
+def christmas_song():
+    melody = [3,3, 3, 3,3, 3, 3,5,1, 2,3, 4,4,4, 4,4, 3,3, 3,3, 5,5,4,2,1]
+    rhythm = [1,1, 2, 1,1, 2, 1,1,2.5, 0.5,4, 1,1,1.5, 0.5,1, 1,1, 0.5,0.5, 1,1,1,1,4]
+    # dir_prefs = [1,0, 1, 1,1, 0, 1,1,1, 0,0, 0,0,0, 1,1, 1,0, 0,0, 0,0,0,0,0]
+    dir_prefs = [1,0, 1, 0,0, 0, 1,1,0, 0,1, 0,1,0, 1,1, 1,1, 1,0, 1,1,0,1,1]
+    notes = [major_scale[note] for note in melody]
+    mp = MusicalPhrase("christmas_song", notes, rhythm, tempo=60, root_key=63)
+    lvl = make_musical_level(mp, direction_preferences=dir_prefs, scale=50, start_pos=[50, 750])
+    lvl.bouncer_size = 10
+    return lvl
+
+
+def rick_roll():
+    major_scale = [-1, 0, 2, 4, 5, 7, 9, 11, 12, -12, -10, -8, -7, -5, -3]
+    melody1 = [1,   2,  -2, 2,    3,   5,4,3,          1,   2, -2,   ]   
+    rhythm1 = [1.5, 1.5, 1, 1.5, 1.5,  0.25,0.25,0.5,   1.5, 1.5, 2, ]
+    dir_prefs1 = [0,   0,   0, 1,    0,   1, 0,1,          1,   0, 0,      ]
+    melody2 = [-2,-1,1,-1,            3, 3, 2,       -2,-1,1,-1,     1,   2,0,-1,-2,-2,     2,1]
+    rhythm2 = [0.25,0.25,0.25,0.25, 1.5,1.5,1.5, 0.25,0.25,0.25,1.0, 1, 0.5,0.75,0.25,1.1,0.5, 1,4]
+    dir_prefs2 = [1,0,1,0,             0, 1, 0,       1,0,1,0,        1,   1,1,1,0,1,      1,0]
+    melody = melody1 + melody2
+    rhythm = rhythm1 + rhythm2
+    dir_prefs = dir_prefs1 + dir_prefs2
+    notes = [major_scale[note] for note in melody]
+    mp = MusicalPhrase("rick_roll", notes, rhythm, tempo=60, root_key=65)
+    lvl = make_musical_level(mp, direction_preferences=dir_prefs, scale=75, start_pos=[00, 50])
+    lvl.bouncer_size = 5
+    return lvl
+    # pass
+
+
+
+# add rick roll
+
+
 
 
 
@@ -185,9 +220,11 @@ if __name__ == "__main__":
     generator.add_level(create_four_triangles())
 
     
-    generator.add_level(basic_musical_level())
+    # generator.add_level(basic_musical_level())
     generator.add_level(twinkle_twinkle())
     generator.add_level(washing_machine_compostion())
+    generator.add_level(christmas_song())
+    generator.add_level(rick_roll())
 
 
     # Save to JSON in the current directory

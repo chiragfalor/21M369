@@ -230,8 +230,6 @@ class Triangle extends Obstacle{
         const normal = createVector(nearestEdge.y, -nearestEdge.x).normalize();
         const dot = p5.Vector.dot(normal, bouncer.vel);
         const reflected = p5.Vector.sub(bouncer.vel, p5.Vector.mult(normal, 2 * dot));
-        console.log(bouncer.vel);
-        console.log(reflected);
         bouncer.vel = reflected;
     }
 }

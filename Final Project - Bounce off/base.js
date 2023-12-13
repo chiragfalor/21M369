@@ -4,6 +4,14 @@ let cur_level_num = 0;
 let demo;
 const show_demo = false;
 
+let totalStart = 0;
+
+let lvlTimeStart = 0;
+let nonLvl = false;
+let lastLvlendTime = 0;
+
+let last_mouse_press = 0;
+
 function setup() {
     createCanvas(800, 800);
     noStroke();
@@ -46,22 +54,49 @@ function setup() {
 
 
 function draw() {
+    if (nonLvl) {
+    // display a screen saying level completed
+    let timeStart = millis();
+    background(200, 100, 100);
+    fill(0, 255, 255);
+    textSize(64);
+    text("Level " + cur_level_num + " completed!", width/2 - 250, height/2-50);
+    // display time of level completion
+    let seconds = Math.floor((lastLvlendTime - lvlTimeStart)/100)/10;
+    text("Time: " + seconds +"s", width/2 - 150, height/2 + 50);
+    let totalSeconds = Math.floor((lastLvlendTime - totalStart)/100)/10;
+    text("Total Time: " + totalSeconds +"s", width/2 - 220, height/2 + 150);
+    if (millis() - lastLvlendTime > 2000) {
+        nonLvl = false;
+        currentLevel = levels[cur_level_num];
+        currentLevel.setup();
+        lvlTimeStart = millis();
+    }
+} else {
+    
     completed = currentLevel.update();
 
     if (completed) {
+        console.log("level completed: " + cur_level_num);
         cur_level_num++;
         if (cur_level_num >= levels.length) {
             cur_level_num = 0;
         }
-        currentLevel = levels[cur_level_num];
-        currentLevel.setup();
-        console.log("level completed: " + cur_level_num);
+        lastLvlendTime = millis();
+        nonLvl = true;
     }
 
     // write level number at top left
     fill(0);
     textSize(32);
-    text(cur_level_num, 10, 30);
+    text(cur_level_num+1, 10, 30);
+
+    
+    // have timer running on the top right
+    fill(0);
+    textSize(32);
+    let seconds = Math.floor((millis() - lvlTimeStart)/100)/10;
+    text(seconds, width - 100, 30);
 
 
 
@@ -70,6 +105,7 @@ function draw() {
         currentLevel.mouseIsPressed();
         }
     }
+}
 }
 
 
@@ -81,6 +117,11 @@ function keyPressed() {
 function mousePressed() {
     // if demo is still playing don't do anything
     if (!demo) {
+        // if time from last mouse press is too short, don't do anything
+        if (millis() - last_mouse_press < 500) {
+            return;
+        }
+        last_mouse_press = millis();
         currentLevel.mousePressed();
     }
     console.log("mouse pressed");

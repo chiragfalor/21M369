@@ -35,8 +35,8 @@ class Bouncer {
     const dy = -(mouseY - bally);
     const v = createVector(dx*mouseEnergy, dy*mouseEnergy);
     // if v is 0, set it to a small value in the x direction
-    if (v.mag() <= 0.1) {
-      v.x = 0.1;
+    if (v.mag() <= 0.2) {
+      v.x = 4;
     }
     return v;
   }
@@ -54,7 +54,6 @@ class Bouncer {
 
         // Draw the ball
         this.draw();
-        // console.log(this.color);
       }
 
     draw() {

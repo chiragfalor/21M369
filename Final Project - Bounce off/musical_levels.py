@@ -26,7 +26,7 @@ class MusicalPhrase:
         self.notes_with_prev_durations.insert(0, (self.notes[0], 1))
 
 
-def make_musical_level(phrase: MusicalPhrase, scale=200, direction_preferences = None):
+def make_musical_level(phrase: MusicalPhrase, scale=200, direction_preferences = None, start_pos = (0, 50), start_dir = 0):
     '''
     phrase: MusicalPhrase object
     '''
@@ -88,8 +88,8 @@ def make_musical_level(phrase: MusicalPhrase, scale=200, direction_preferences =
         normal_v = -incoming_v + outgoing_v
         return np.arctan2(normal_v[1], normal_v[0])
         
-    cur_pos = np.array([0, scale//4])
-    cur_dir = 0
+    cur_pos = np.array(start_pos) + scale * unit_vector(start_dir)
+    cur_dir = start_dir
     obstacle_coords = []
 
     for i, (note, duration) in enumerate(phrase.notes_with_prev_durations):

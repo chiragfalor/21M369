@@ -1,3 +1,4 @@
+
 function drawArrow(x1, y1, x2, y2, thickness, color) {
     push();
     stroke(color);
@@ -34,6 +35,8 @@ class Level {
         // clear();
         background(200, 100, 100, 500);
 
+
+
         // update the objects
         this.objects.forEach(object => object.update());
 
@@ -41,6 +44,16 @@ class Level {
         for (let i = 0; i < this.bouncers.length; i++) {
             const bouncer = this.bouncers[i];
             bouncer.update();
+            
+            // check if the bouncer collides with any object
+            for (let j = 0; j < this.objects.length; j++) {
+                const object = this.objects[j];
+                if (bouncer.destroy(object)) {
+                    // remove the object if it is not hard
+                    this.objects.splice(j, 1);
+                    j--;
+                }
+            }
             // if any bouncer is out of bounds, remove it
             if (bouncer.isOutOfBounds()) {
                 // check if all not is_hard objects are destroyed
@@ -53,15 +66,6 @@ class Level {
                 this.objects = this.objects.concat(bouncer.destroyed_objects);
                 this.bouncers.splice(i, 1);
                 i--;
-            }
-            // check if the bouncer collides with any object
-            for (let j = 0; j < this.objects.length; j++) {
-                const object = this.objects[j];
-                if (bouncer.destroy(object)) {
-                    // remove the object if it is not hard
-                    this.objects.splice(j, 1);
-                    j--;
-                }
             }
             // for (let j = 0; j < this.objects.length; j++) {
             //     const object = this.objects[j];
